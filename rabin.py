@@ -38,9 +38,25 @@ class SkrotBase(BinHexStr):
         pass
 
 
-class RabinSkrot(SkrotBase):
-    def gen_blok_do_szyfru_klucz(self):
-        pass
+
+class Rabin(SkrotBase):
+    def __init__(self, key_size=16, skrot_size=32, algorytm = algorithms.AES):
+        self.backend = default_backend()
+        self.algorytm = algorytm
+        self.key_size = key_size
+        self.skrot_size = skrot_size
+        np.random.seed(13)
+        self.mode = None
+        # self.mode = modes.CBC(np.random.bytes(16)) #tylko 16, padding wymagany
+        # self.mode = modes.GCM(np.random.bytes(16)) #moga byc rozne rozmiary 1 - 2^64
+        # self.mode = modes.CTR(np.random.bytes(16)) # tylko 16
+
+    def skrot(self):
+        wejscie = self.init_value(byte_length=self.skrot_size)
+        for blok in self.gen_blok_do_szyfru_klucz(key_len_bytes=self.key_size):
+            wyjscie = self.szyfruj(klucz=blok, wiadomosc=wejscie)
+            wejscie = wyjscie
+        return self.hex_from_bin(wyjscie)
 
     def _generator_klucza(self, bytes_io, byte_len):
         '''z bloku danych w ramie generuje paczki o byte_len dlugosci
@@ -48,33 +64,11 @@ class RabinSkrot(SkrotBase):
         CHUNK = byte_len  # 16 bajtow to 128bitow
         return iter(partial(bytes_io.read, CHUNK), b'')
 
-    def szyfruj(self, klucz, wiadomosc):
-        pass
-
     def init_value(self, byte_length=32):
         # byte_length determinuje dlugosc wyjsciowa skrotu
         # 16 bajtow to 128 bitow
         np.random.seed(42)
         return np.random.bytes(byte_length)
-
-
-
-class RabinAES(RabinSkrot):
-    def __init__(self):
-        self.backend = default_backend()
-        np.random.seed(13)
-        self.aes_key_size = 16
-        self.skrot_size = 32
-        self.mode = modes.CBC(np.random.bytes(16)) #tylko 16, padding wymagany
-        # self.mode = modes.GCM(np.random.bytes(16)) #moga byc rozne rozmiary 1 - 2^64
-        # self.mode = modes.CTR(np.random.bytes(16)) # tylko 16
-
-    def skrot(self):
-        wejscie = self.init_value(byte_length=self.skrot_size)
-        for blok in self.gen_blok_do_szyfru_klucz(key_len_bytes=self.aes_key_size):
-            wyjscie = self.szyfruj(klucz=blok, wiadomosc=wejscie)
-            wejscie = wyjscie
-        return self.hex_from_bin(wyjscie)
 
     def pobierz_dane_binarne(self, bin_data):
         self.bytes_io = BytesIO(bin_data)
@@ -101,24 +95,44 @@ class RabinAES(RabinSkrot):
             yield block
 
     def szyfruj(self, klucz, wiadomosc):
-        cipher = Cipher(algorithm=algorithms.AES(klucz), mode=self.mode, backend=self.backend)
+        cipher = Cipher(algorithm=self.algorytm(klucz), mode=self.mode, backend=self.backend)
         encryptor = cipher.encryptor()
         szyfrogram = encryptor.update(wiadomosc) + encryptor.finalize()
         return szyfrogram
 
+class RabinAES(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(RabinAES, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.AES)
 
 
-class RabinFileAES(RabinAES):
-    def __init__(self, file, file_chunk=1024, key_size=16, skrot_size=32):
-        self.backend = default_backend()
+class RabinAES128(RabinAES):
+    def __init__(self, skrot_size):
+        super(RabinAES128, self).__init__(key_size=16, skrot_size=skrot_size)
+
+class RabinAES128_CBC128(RabinAES128):
+    def __init__(self, skrot_size=32):
+        super(RabinAES128_CBC128, self).__init__(skrot_size=skrot_size)
+        self.mode = self.mode = modes.CBC(np.random.bytes(16))
+
+class RabinAES128_CTR128(RabinAES128):
+    def __init__(self, skrot_size=32):
+        super(RabinAES128_CTR128, self).__init__(skrot_size=skrot_size)
+        self.mode = self.mode = modes.CTR(np.random.bytes(16))
+
+class RabinAES192(RabinAES):
+    def __init__(self):
+        super(RabinAES192, self).__init__(key_size=24)
+
+class RabinAES256(RabinAES):
+    def __init__(self):
+        super(RabinAES256, self).__init__(key_size=32)
+
+class RabinFileAES128_CBC128(RabinAES128_CBC128):
+    def __init__(self, file, file_chunk=1024, skrot_size=32):
+        super(RabinFileAES128_CBC128, self).__init__(skrot_size=skrot_size)
         np.random.seed(13)
-        self.aes_key_size = key_size
-        self.skrot_size = skrot_size
         self.file_chunk = file_chunk #1024
         self.file = file
-        self.mode = modes.CBC(np.random.bytes(16))  # tylko 16, padding wymagany
-        # self.mode = modes.GCM(np.random.bytes(16)) #moga byc rozne rozmiary 1 - 2^64
-        # self.mode = modes.CTR(np.random.bytes(16)) # tylko 16
 
     def gen_blok_do_szyfru_klucz(self, key_len_bytes):
         with open(self.file, 'rb') as f:
@@ -134,7 +148,6 @@ class RabinFileAES(RabinAES):
                     elif len_block > key_len_bytes:
                         raise Exception("blok wiekszy niz niz zakladano, szyfr go nie lyknie jako klucz")
                     yield key_block
-
 
 
 class InnySkrot(SkrotBase):

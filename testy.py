@@ -1,14 +1,14 @@
 # coding=utf-8
 import unittest
 import binascii
-from rabin import BinHexStr, RabinAES, SHA256, MD5, RabinFileAES
+from rabin import BinHexStr, RabinAES128_CBC128, SHA256, MD5, RabinFileAES128_CBC128
 
 import numpy as np
 
 class RabinTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.rabin = RabinAES()
+        cls.rabin = RabinAES128_CBC128()
 
     def test_bytearray_to_hexstring(self):
         string = 'ALA'
@@ -33,7 +33,7 @@ class RabinTest(unittest.TestCase):
                          BinHexStr.hex_from_bin(bin_data))
 
     def test_generator_klucza(self):
-        r = RabinAES()
+        r = RabinAES128_CBC128()
         text = 'a'*16 + 'b' * 17 + 'ł'
         r.pobierz_dane_tekstowe(text)
         generator = r._generator_klucza(r.bytes_io, byte_len=16)
@@ -43,26 +43,26 @@ class RabinTest(unittest.TestCase):
         self.assertEqual(lista, ['a' * 16, 'b' * 16, 'b=C5=82'])
 
     def test_podaj_blok_do_AESa(self):
-        r = RabinAES()
+        r = RabinAES128_CBC128()
         text = 'a' * 16 + 'b' * 17 + 'ł'
         r.pobierz_dane_tekstowe(text)
         for block in r.gen_blok_do_szyfru_klucz(key_len_bytes=16):
             self.assertEqual(16, len(block))
 
     def test_szyfruj(self):
-        r = RabinAES()
+        r = RabinAES128_CBC128()
         self.assertEqual('b37165e2fcb77375fb1b16a4696d896d',
                          r.hex_from_bin(r.szyfruj(b'1234567890123456', b"a secret message")))
 
     def test_skrot(self):
-        r = RabinAES()
+        r = RabinAES128_CBC128()
         text = b'a'*16 + b'ba'
         r.pobierz_dane_tekstowe(text)
         self.assertEqual('23468570f72bacc1b269d40dde92b8406826838c1eceff2dc25fadbf02b7465e',
                          r.skrot())
 
     def test_podaj_blok_do_AESa_z_pliku1(self):
-        r = RabinFileAES('alfabet2048.bin')
+        r = RabinFileAES128_CBC128('alfabet2048.bin')
         i = 0
         length = 0
         for b in  r.gen_blok_do_szyfru_klucz(key_len_bytes=16):
@@ -72,7 +72,7 @@ class RabinTest(unittest.TestCase):
         self.assertEqual(2048, length)
 
     def test_podaj_blok_do_AESa_z_pliku2(self):
-        r = RabinFileAES('alfabet2050.bin')
+        r = RabinFileAES128_CBC128('alfabet2050.bin')
         i = 0
         length = 0
         for blok in r.gen_blok_do_szyfru_klucz(key_len_bytes=16):
@@ -83,18 +83,21 @@ class RabinTest(unittest.TestCase):
 
 
     def test_file_skrot1(self):
-        r = RabinFileAES('alfabet2048.bin')
+        r = RabinFileAES128_CBC128('alfabet2048.bin')
         self.assertEqual('b2dc7bca4d3950b38c3bd042f93bcf28247bd7fa112e0edf6e60c56790c80604',
                          r.skrot())
 
     def test_file_equal_normal(self):
         with open('alfabet2050.bin', 'rb') as f:
             bin_data = f.read()
-        r = RabinAES()
+        r = RabinAES128_CBC128()
         r.pobierz_dane_binarne(bin_data)
-        r2 = RabinFileAES(file='alfabet2050.bin')
+        r2 = RabinFileAES128_CBC128(file='alfabet2050.bin')
         self.assertEqual(r.skrot(), r2.skrot())
 
+class RozneRabiny(unittest.TestCase):
+    def test_RabinAES128(self):
+        pass
 
 
 class InneSkroty(unittest.TestCase):
