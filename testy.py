@@ -5,7 +5,7 @@ from rabin import BinHexStr, RabinAES128_CBC128, SHA256, MD5, RabinFileAES128_CB
 
 import numpy as np
 
-class RabinTest(unittest.TestCase):
+class OgolnyRabinTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.rabin = RabinAES128_CBC128()

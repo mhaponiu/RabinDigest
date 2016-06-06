@@ -127,17 +127,11 @@ class RabinAES256(RabinAES):
     def __init__(self):
         super(RabinAES256, self).__init__(key_size=32)
 
-class RabinFileAES128_CBC128(RabinAES128_CBC128):
-    def __init__(self, file, file_chunk=1024, skrot_size=32):
-        super(RabinFileAES128_CBC128, self).__init__(skrot_size=skrot_size)
-        np.random.seed(13)
-        self.file_chunk = file_chunk #1024
-        self.file = file
-
+class RabinFile(object):
     def gen_blok_do_szyfru_klucz(self, key_len_bytes):
         with open(self.file, 'rb') as f:
             CHUNK = self.file_chunk  # 16 bajtow to 128bitow
-            file_gen =  iter(partial(f.read, CHUNK), b'')
+            file_gen = iter(partial(f.read, CHUNK), b'')
             np.random.seed(69)
             for file_block in file_gen:
                 file_block = BytesIO(file_block)
@@ -148,6 +142,14 @@ class RabinFileAES128_CBC128(RabinAES128_CBC128):
                     elif len_block > key_len_bytes:
                         raise Exception("blok wiekszy niz niz zakladano, szyfr go nie lyknie jako klucz")
                     yield key_block
+
+class RabinFileAES128_CBC128(RabinFile, RabinAES128_CBC128):
+    def __init__(self, file, file_chunk=1024, skrot_size=32):
+        super(RabinFileAES128_CBC128, self).__init__(skrot_size=skrot_size)
+        np.random.seed(13)
+        self.file_chunk = file_chunk #1024
+        self.file = file
+
 
 
 class InnySkrot(SkrotBase):
