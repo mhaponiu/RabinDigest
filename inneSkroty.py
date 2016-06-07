@@ -28,3 +28,6 @@ class MD5(InnySkrot):
         super(MD5, self).__init__(hashes.MD5())
 
 
+class InnySkrotFile(SkrotBase):
+    def __init__(self, file):
+        self.file = file

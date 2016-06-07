@@ -3,8 +3,14 @@ import os
 import unittest
 import binascii
 
+from Rabin3DES._128 import RabinFile3DES128_CBC64
 from RabinAES._192 import RabinFileAES192_CBC128
 from RabinAES._256 import RabinFileAES256_CBC128
+from RabinARC4._128 import RabinFileARC4_128
+from RabinBlowfish._128 import RabinFileBlowfish128_CBC64
+from RabinCAST5._128 import RabinFileCAST5_128_CBC64
+from RabinCamellia._128 import RabinFileCamellia128_CBC128
+from RabinSEED._128 import RabinFileSEED128_CBC128
 from inneSkroty import MD5, SHA256
 from rabin import BinHexStr
 from RabinAES._128 import RabinAES128_CBC128, RabinFileAES128_CBC128, RabinFileAES128_CTR128, RabinFileAES128_GCM128, \
@@ -159,7 +165,7 @@ class TestRozneRabinyFile(object):
         podobienstwo = 1 - float(rozniace_sie)/dlugosc
         return podobienstwo
 
-#AES 128
+#AES 128 (blokowy)
 class Test_RabinFileAES128_CBC128(TestRozneRabinyFile, unittest.TestCase):
     def setUp(self):
         self.klasa = RabinFileAES128_CBC128
@@ -176,20 +182,49 @@ class Test_RabinFileAES128_GCM512(TestRozneRabinyFile, unittest.TestCase):
     def setUp(self):
         self.klasa = RabinFileAES128_GCM512
 
-# AES 192
+# AES 192 (blokowy)
 class Test_RabinFileAES192_CBC128(TestRozneRabinyFile, unittest.TestCase):
     def setUp(self):
         self.klasa = RabinFileAES192_CBC128
 
-#AES 256
+#AES 256 (blokowy)
 class Test_RabinFileAES256_CBC128(TestRozneRabinyFile, unittest.TestCase):
     def setUp(self):
         self.klasa = RabinFileAES256_CBC128
 
+#3DES 128 (blokowy)
+class Test_RabinFile3DES128_CBC64(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFile3DES128_CBC64
 
+#Camellia 128 (blokowy)
+class Test_RabinFileCamellia128_CBC128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileCamellia128_CBC128
 
+#Blowfish 128 (blokowy)
+class Test_RabinFileBlowfish128_CBC128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileBlowfish128_CBC64
 
+#ARC4 (strumieniowy)
+class Test_RabinFileARC4_128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileARC4_128
 
+#CAST5
+class Test_RabinFileCAST5_128_CBC64(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileCAST5_128_CBC64
+
+#SEED
+class Test_RabinFileSEED128_CBC128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileSEED128_CBC128
+
+class InneSkrotyFile(unittest.TestCase):
+    # TODO
+    pass
 
 class InneSkroty(unittest.TestCase):
 

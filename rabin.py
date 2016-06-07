@@ -103,6 +103,33 @@ class RabinAES(Rabin):
     def __init__(self, key_size, skrot_size):
         super(RabinAES, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.AES)
 
+class Rabin3DES(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(Rabin3DES, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.TripleDES)
+
+class RabinCamellia(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(RabinCamellia, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.Camellia)
+
+class RabinBlowfish(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(RabinBlowfish, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.Blowfish)
+
+class RabinARC4(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(RabinARC4, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.ARC4)
+
+class RabinCAST5(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(RabinCAST5, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.CAST5)
+
+class RabinSEED(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(RabinSEED, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.SEED)
+
+class RabinIDEA(Rabin):
+    def __init__(self, key_size, skrot_size):
+        super(RabinIDEA, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.IDEA)
 
 class RabinFile(object):
     def gen_blok_do_szyfru_klucz(self, key_len_bytes):
@@ -119,7 +146,6 @@ class RabinFile(object):
                     elif len_block > key_len_bytes:
                         raise Exception("blok wiekszy niz niz zakladano, szyfr go nie lyknie jako klucz")
                     yield key_block
-
 
 
 
