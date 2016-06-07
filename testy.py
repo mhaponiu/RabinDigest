@@ -1,7 +1,8 @@
 # coding=utf-8
+import os
 import unittest
 import binascii
-from rabin import BinHexStr, RabinAES128_CBC128, SHA256, MD5, RabinFileAES128_CBC128
+from rabin import BinHexStr, RabinAES128_CBC128, SHA256, MD5, RabinFileAES128_CBC128, RabinFileAES128_CTR128
 
 import numpy as np
 
@@ -9,6 +10,13 @@ class OgolnyRabinTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.rabin = RabinAES128_CBC128()
+        dir_test_data = 'test_data'
+        cls.alfabet2kb = os.path.join(dir_test_data, 'alfabet2kB.bin')
+        cls.alfabet2kb_plus_2 = os.path.join(dir_test_data, 'alfabet2kB_plus2.bin')
+        cls.alfabet2kb_1_inny = os.path.join(dir_test_data, 'alfabet2kB_1inny.bin')
+        # cls.alfabet4MB = os.path.join(dir_test_data, 'alfabet4MB.bin')
+        # cls.alfabet4MB_plus_2 = os.path.join(dir_test_data, 'alfabet4MB_plus2.bin')
+        # cls.alfabet4MB_1_inny = os.path.join(dir_test_data, 'alfabet4MB_1inny.bin')
 
     def test_bytearray_to_hexstring(self):
         string = 'ALA'
@@ -62,7 +70,7 @@ class OgolnyRabinTest(unittest.TestCase):
                          r.skrot())
 
     def test_podaj_blok_do_AESa_z_pliku1(self):
-        r = RabinFileAES128_CBC128('alfabet2048.bin')
+        r = RabinFileAES128_CBC128(self.alfabet2kb)
         i = 0
         length = 0
         for b in  r.gen_blok_do_szyfru_klucz(key_len_bytes=16):
@@ -72,7 +80,7 @@ class OgolnyRabinTest(unittest.TestCase):
         self.assertEqual(2048, length)
 
     def test_podaj_blok_do_AESa_z_pliku2(self):
-        r = RabinFileAES128_CBC128('alfabet2050.bin')
+        r = RabinFileAES128_CBC128(self.alfabet2kb_plus_2)
         i = 0
         length = 0
         for blok in r.gen_blok_do_szyfru_klucz(key_len_bytes=16):
@@ -83,21 +91,79 @@ class OgolnyRabinTest(unittest.TestCase):
 
 
     def test_file_skrot1(self):
-        r = RabinFileAES128_CBC128('alfabet2048.bin')
+        r = RabinFileAES128_CBC128(self.alfabet2kb)
         self.assertEqual('b2dc7bca4d3950b38c3bd042f93bcf28247bd7fa112e0edf6e60c56790c80604',
                          r.skrot())
 
     def test_file_equal_normal(self):
-        with open('alfabet2050.bin', 'rb') as f:
+        with open(self.alfabet2kb_plus_2, 'rb') as f:
             bin_data = f.read()
         r = RabinAES128_CBC128()
         r.pobierz_dane_binarne(bin_data)
-        r2 = RabinFileAES128_CBC128(file='alfabet2050.bin')
+        r2 = RabinFileAES128_CBC128(file=self.alfabet2kb_plus_2)
         self.assertEqual(r.skrot(), r2.skrot())
 
-class RozneRabiny(unittest.TestCase):
-    def test_RabinAES128(self):
-        pass
+# @unittest.skip('.')
+class TestRozneRabinyFile(object):
+
+    @classmethod
+    def setUpClass(cls):
+        dir_test_data = 'test_data'
+        cls.alfabet2kB = os.path.join(dir_test_data, 'alfabet2kB.bin')
+        cls.alfabet2kB_plus_2 = os.path.join(dir_test_data, 'alfabet2kB_plus2.bin')
+        cls.alfabet2kB_1_inny = os.path.join(dir_test_data, 'alfabet2kB _1inny.bin')
+
+        cls.alfabet2MB = os.path.join(dir_test_data, 'alfabet2MB.bin')
+        cls.alfabet2MB_plus_2 = os.path.join(dir_test_data, 'alfabet2MB_plus2.bin')
+        cls.alfabet2MB_1_inny = os.path.join(dir_test_data, 'alfabet2MB_1inny.bin')
+
+    def test_normal_2k(self):
+        self.r = self.klasa(file=self.alfabet2kB, file_chunk=1024, skrot_size=32)
+        self.r.skrot()
+
+    # @unittest.skip('')
+    # def test_normal_2M_2k_equal(self):
+    #     r1 = self.klasa(file=self.alfabet2MB, file_chunk=1024, skrot_size=32)
+    #     skrot_blok_1k = r1.skrot()
+    #     r2 = self.klasa(file=self.alfabet2MB, file_chunk=1048576, skrot_size=32)
+    #     skrot_blok_1M =  r2.skrot()
+    #     self.assertEqual(skrot_blok_1k, skrot_blok_1M)
+
+    def test_1inny_2k(self):
+        r1 = self.klasa(file=self.alfabet2kB, file_chunk=1024, skrot_size=32)
+        skrot1 = r1.skrot()
+        r2 = self.klasa(file=self.alfabet2kB_1_inny, file_chunk=1024, skrot_size=32)
+        skrot2 = r2.skrot()
+        p = self._podobienstwo_ciagow(skrot1, skrot2)
+        self.assertLess(p, 0.15) # 0.04% tych samych znakow
+
+    def test_2wiecej(self):
+        r1 = self.klasa(file=self.alfabet2kB, file_chunk=1024, skrot_size=32)
+        skrot1 = r1.skrot()
+        r2 = self.klasa(file=self.alfabet2kB_plus_2, file_chunk=1024, skrot_size=32)
+        skrot2 = r2.skrot()
+        p = self._podobienstwo_ciagow(skrot1, skrot2)
+        self.assertLess(p, 0.15)  # 0.04% tych samych znakow
+
+    def _podobienstwo_ciagow(self, skrot1, skrot2):
+        dlugosc = len(skrot1)
+        rozniace_sie = 0
+        for a in zip(skrot1, skrot2):
+            if a[0] != a[1]:
+                rozniace_sie = rozniace_sie + 1
+        podobienstwo = 1 - float(rozniace_sie)/dlugosc
+        return podobienstwo
+
+
+class Test_RabinFileAES_CBC128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileAES128_CBC128
+
+class Test_RabinFileAES_CTR128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileAES128_CTR128
+
+
 
 
 class InneSkroty(unittest.TestCase):
