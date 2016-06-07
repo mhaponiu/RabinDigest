@@ -2,9 +2,11 @@
 import os
 import unittest
 import binascii
-from rabin import BinHexStr, RabinAES128_CBC128, SHA256, MD5, RabinFileAES128_CBC128, RabinFileAES128_CTR128
 
-import numpy as np
+from inneSkroty import MD5, SHA256
+from rabin import BinHexStr
+from RabinAES._128 import RabinAES128_CBC128, RabinFileAES128_CBC128, RabinFileAES128_CTR128
+
 
 class OgolnyRabinTest(unittest.TestCase):
     @classmethod

@@ -1,6 +1,5 @@
 import binascii
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers import Cipher, modes, algorithms
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms
 from cryptography.hazmat.backends import default_backend
 import numpy as np
 from functools import partial
@@ -105,28 +104,6 @@ class RabinAES(Rabin):
         super(RabinAES, self).__init__(key_size=key_size, skrot_size=skrot_size, algorytm=algorithms.AES)
 
 
-class RabinAES128(RabinAES):
-    def __init__(self, skrot_size):
-        super(RabinAES128, self).__init__(key_size=16, skrot_size=skrot_size)
-
-class RabinAES128_CBC128(RabinAES128):
-    def __init__(self, skrot_size=32):
-        super(RabinAES128_CBC128, self).__init__(skrot_size=skrot_size)
-        self.mode = self.mode = modes.CBC(np.random.bytes(16))
-
-class RabinAES128_CTR128(RabinAES128):
-    def __init__(self, skrot_size=32):
-        super(RabinAES128_CTR128, self).__init__(skrot_size=skrot_size)
-        self.mode = self.mode = modes.CTR(np.random.bytes(16))
-
-class RabinAES192(RabinAES):
-    def __init__(self):
-        super(RabinAES192, self).__init__(key_size=24)
-
-class RabinAES256(RabinAES):
-    def __init__(self):
-        super(RabinAES256, self).__init__(key_size=32)
-
 class RabinFile(object):
     def gen_blok_do_szyfru_klucz(self, key_len_bytes):
         with open(self.file, 'rb') as f:
@@ -144,46 +121,7 @@ class RabinFile(object):
                     yield key_block
 
 
-class RabinFileAES128_CBC128(RabinFile, RabinAES128_CBC128):
-    def __init__(self, file, file_chunk=1024, skrot_size=32):
-        super(RabinFileAES128_CBC128, self).__init__(skrot_size=skrot_size)
-        np.random.seed(13)
-        self.file_chunk = file_chunk
-        self.file = file
 
-class RabinFileAES128_CTR128(RabinFile, RabinAES128_CTR128):
-    def __init__(self, file, file_chunk=1024, skrot_size=32):
-        super(RabinFileAES128_CTR128, self).__init__(skrot_size=skrot_size)
-        np.random.seed(13)
-        self.file_chunk = file_chunk
-        self.file = file
-
-
-
-class InnySkrot(SkrotBase):
-    def __init__(self, algorytm):
-        self.digest = hashes.Hash(algorytm, backend=default_backend())
-
-    def skrot(self):
-        self.digest.update(self.bin_data)
-        return self.hex_from_bin(self.digest.finalize())
-
-    def pobierz_dane_binarne(self, bin_data):
-        self.bin_data = bin_data
-
-    def pobierz_dane_tekstowe(self, text_data):
-        bin_data = self.bin_from_str(text_data)
-        self.pobierz_dane_binarne(bin_data)
-
-
-class SHA256(InnySkrot):
-    def __init__(self):
-        super(SHA256, self).__init__(hashes.SHA256())
-
-
-class MD5(InnySkrot):
-    def __init__(self):
-        super(MD5, self).__init__(hashes.MD5())
 
 
 
