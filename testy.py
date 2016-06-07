@@ -3,9 +3,12 @@ import os
 import unittest
 import binascii
 
+from RabinAES._192 import RabinFileAES192_CBC128
+from RabinAES._256 import RabinFileAES256_CBC128
 from inneSkroty import MD5, SHA256
 from rabin import BinHexStr
-from RabinAES._128 import RabinAES128_CBC128, RabinFileAES128_CBC128, RabinFileAES128_CTR128
+from RabinAES._128 import RabinAES128_CBC128, RabinFileAES128_CBC128, RabinFileAES128_CTR128, RabinFileAES128_GCM128, \
+    RabinFileAES128_GCM512
 
 
 class OgolnyRabinTest(unittest.TestCase):
@@ -123,13 +126,13 @@ class TestRozneRabinyFile(object):
         self.r = self.klasa(file=self.alfabet2kB, file_chunk=1024, skrot_size=32)
         self.r.skrot()
 
-    # @unittest.skip('')
-    # def test_normal_2M_2k_equal(self):
-    #     r1 = self.klasa(file=self.alfabet2MB, file_chunk=1024, skrot_size=32)
-    #     skrot_blok_1k = r1.skrot()
-    #     r2 = self.klasa(file=self.alfabet2MB, file_chunk=1048576, skrot_size=32)
-    #     skrot_blok_1M =  r2.skrot()
-    #     self.assertEqual(skrot_blok_1k, skrot_blok_1M)
+    @unittest.skip('')
+    def test_normal_2M_2k_equal(self):
+        r1 = self.klasa(file=self.alfabet2MB, file_chunk=1024, skrot_size=32)
+        skrot_blok_1k = r1.skrot()
+        r2 = self.klasa(file=self.alfabet2MB, file_chunk=1048576, skrot_size=32)
+        skrot_blok_1M =  r2.skrot()
+        self.assertEqual(skrot_blok_1k, skrot_blok_1M)
 
     def test_1inny_2k(self):
         r1 = self.klasa(file=self.alfabet2kB, file_chunk=1024, skrot_size=32)
@@ -139,7 +142,7 @@ class TestRozneRabinyFile(object):
         p = self._podobienstwo_ciagow(skrot1, skrot2)
         self.assertLess(p, 0.15) # 0.04% tych samych znakow
 
-    def test_2wiecej(self):
+    def test_2wiecej_2k(self):
         r1 = self.klasa(file=self.alfabet2kB, file_chunk=1024, skrot_size=32)
         skrot1 = r1.skrot()
         r2 = self.klasa(file=self.alfabet2kB_plus_2, file_chunk=1024, skrot_size=32)
@@ -156,14 +159,34 @@ class TestRozneRabinyFile(object):
         podobienstwo = 1 - float(rozniace_sie)/dlugosc
         return podobienstwo
 
-
-class Test_RabinFileAES_CBC128(TestRozneRabinyFile, unittest.TestCase):
+#AES 128
+class Test_RabinFileAES128_CBC128(TestRozneRabinyFile, unittest.TestCase):
     def setUp(self):
         self.klasa = RabinFileAES128_CBC128
 
-class Test_RabinFileAES_CTR128(TestRozneRabinyFile, unittest.TestCase):
+class Test_RabinFileAES128_CTR128(TestRozneRabinyFile, unittest.TestCase):
     def setUp(self):
         self.klasa = RabinFileAES128_CTR128
+
+class Test_RabinFileAES128_GCM128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileAES128_GCM128
+
+class Test_RabinFileAES128_GCM512(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileAES128_GCM512
+
+# AES 192
+class Test_RabinFileAES192_CBC128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileAES192_CBC128
+
+#AES 256
+class Test_RabinFileAES256_CBC128(TestRozneRabinyFile, unittest.TestCase):
+    def setUp(self):
+        self.klasa = RabinFileAES256_CBC128
+
+
 
 
 

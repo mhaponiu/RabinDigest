@@ -26,3 +26,5 @@ class SHA256(InnySkrot):
 class MD5(InnySkrot):
     def __init__(self):
         super(MD5, self).__init__(hashes.MD5())
+
+
