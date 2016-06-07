@@ -11,7 +11,8 @@ from RabinBlowfish._128 import RabinFileBlowfish128_CBC64
 from RabinCAST5._128 import RabinFileCAST5_128_CBC64
 from RabinCamellia._128 import RabinFileCamellia128_CBC128
 from RabinSEED._128 import RabinFileSEED128_CBC128
-from inneSkroty import MD5, SHA256
+from inneSkroty import MD5, SHA256, MD5_file, SHA1_file, SHA256_file, SHA512_file, Ripemd160_file, \
+    Whirlpool_file, MD4_file
 from rabin import BinHexStr
 from RabinAES._128 import RabinAES128_CBC128, RabinFileAES128_CBC128, RabinFileAES128_CTR128, RabinFileAES128_GCM128, \
     RabinFileAES128_GCM512
@@ -223,8 +224,38 @@ class Test_RabinFileSEED128_CBC128(TestRozneRabinyFile, unittest.TestCase):
         self.klasa = RabinFileSEED128_CBC128
 
 class InneSkrotyFile(unittest.TestCase):
-    # TODO
-    pass
+    @classmethod
+    def setUpClass(cls):
+        cls.sciezka = 'test_data/alfabet2kB.bin'
+
+    def test_MD4(self):
+        s = MD4_file(self.sciezka)
+        s.skrot()
+
+    def test_MD5(self):
+        s = MD5_file(self.sciezka)
+        s.skrot()
+
+    def test_SHA1(self):
+        s = SHA1_file(self.sciezka)
+        s.skrot()
+
+    def test_SHA256(self):
+        s = SHA256_file(self.sciezka)
+        s.skrot()
+
+    def test_SHA512(self):
+        s = SHA512_file(self.sciezka)
+        s.skrot()
+
+    def test_Ripemd160(self):
+        s = Ripemd160_file(self.sciezka)
+        s.skrot()
+
+    def test_Whirlpool(self):
+        s = Whirlpool_file(self.sciezka)
+        s.skrot()
+
 
 class InneSkroty(unittest.TestCase):
 
