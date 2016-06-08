@@ -133,7 +133,7 @@ class TestRozneRabinyFile(object):
         self.r = self.klasa(file=self.alfabet2kB, file_chunk=1024, skrot_size=32)
         self.r.skrot()
 
-    @unittest.skip('')
+    @unittest.skip('pominieto test, dlugo sie wykonuje')
     def test_normal_2M_2k_equal(self):
         r1 = self.klasa(file=self.alfabet2MB, file_chunk=1024, skrot_size=32)
         skrot_blok_1k = r1.skrot()
