@@ -1,0 +1,9 @@
+In[2]: from digest_all import *
+In[3]: r = RabinFileAES256_CBC128(file='test_data/alfabet2MB.bin', file_chunk=1024, skrot_size=32)
+In[4]: r.skrot()
+Out[4]: 'efd3956c9a9df6e240db6f4ee9cdcc8fe0aab26df1337f4157442d503198dc43'
+
+In[2]: from digest_all import *
+In[3]: r = SHA256_file('test_data/alfabet2MB.bin')
+In[4]: r.skrot()
+Out[4]: '0ab04627cbd664cd9d7de6e05c55a41d4ec1074c8ede195330a399388e9ac58f'
