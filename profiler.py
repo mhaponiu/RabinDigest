@@ -245,6 +245,44 @@ class Profiler(object):
             # plt.plot(waga, czas, color=skrot[0])
         plt.savefig('inne')
 
+    def rysuj_whirlpool_aes256(self):
+        pliki_wszystkie = os.listdir(self.profiler_dir)
+        pliki = [p for p in pliki_wszystkie if '.stat' in p]
+        pliki.sort(key=lambda a: int(a.split('.')[0]))
+        # plt.xscale('log', basex=2)
+        # plt.yscale('log', basey=2)
+        plt.grid(True)
+        plt.ylabel('czas [s]')
+        plt.xlabel('waga pliku')
+        plt.title('Najszybszy rabin i najwolniejszy inny')
+
+        skroty = [(RabinFileAES256_CBC128, 'c'),
+                  (Whirlpool_file, 'r')]
+        for skrot in [skroty[0]]:
+            czas = []
+            waga = []
+            s = self._nazwa_klasy(skrot[0]('cokolwiek'))
+            for file in pliki:
+                json_stat = self.profiler_dir + '/' + file
+                with open(json_stat, 'rt') as f:
+                    slownik = json.load(f)
+                    czas.append(slownik[s]['file_chunk_1048576']['czas'])
+                    waga.append(int(file.split('.')[0]))
+            plt.plot(waga, czas, skrot[1] + '.-', label=s)
+            plt.legend(loc=2)
+        for skrot in [skroty[1]]:
+            czas = []
+            waga = []
+            s = self._nazwa_klasy(skrot[0]('cokolwiek'))
+            for file in pliki:
+                json_stat = self.profiler_dir + '/' + file
+                with open(json_stat, 'rt') as f:
+                    slownik = json.load(f)
+                    czas.append(slownik[s]['czas'])
+                    waga.append(int(file.split('.')[0]))
+            plt.plot(waga, czas, skrot[1] + '.-', label=s)
+            plt.legend(loc=2)
+        plt.savefig('whirlpool_aes_256')
 
 if __name__ == '__main__':
     pro = Profiler()
@@ -252,12 +290,14 @@ if __name__ == '__main__':
     # print [pro.filtruj_nazwe(2**n) for n in range(0,32)]
     # pro.statystyki_1_watek()
 
-    pro.statystyki_kilka_procesow()
+    # pro.statystyki_kilka_procesow()
 
     # plt.xscale('log', basex=2)
     # plt.yscale('log', basey=2)
 
+    # ODPALAC KAZDY POJEDYNCZO BO INACZEJ RYSUJA SIE JAKOS NAWZAJEM PO SOBIE
     # pro.rysuj_rabiny_128()
     # pro.rysuj_aesy()
     # pro.rysuj_aesy_128_rozne_tryby()
     # pro.rysuj_inne()
+    # pro.rysuj_whirlpool_aes256()
