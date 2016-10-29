@@ -19,7 +19,7 @@ from inneSkroty import MD4_file, MD5_file, SHA1_file, SHA256_file, SHA512_file, 
 
 class Profiler(object):
     def __init__(self):
-        self.profiler_dir = 'profile_data'
+        self.profiler_dir = 'doc/profile_data'
         self.rozszerzenie_pliku = 'bin'
         self.pliki = os.listdir(self.profiler_dir)
         self.pliki = [p for p in self.pliki if '.bin' in p]
